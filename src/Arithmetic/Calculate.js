@@ -1,59 +1,69 @@
-import React from 'react';
+import React from "react";
 
 const Calculate = (props) => {
 
-	// TODO: complete isValid to make sure there are no operators twice in a row or as the last element
-
 	const isValid = (elements) => {
-		const isFirstElementAnInt = (Number.isInteger(Number(elements[0])));
+		const isFirstElementInt = Number.isInteger(Number(elements[0]));
+		const isLastElementInt = Number.isInteger(
+			Number(elements[elements.length - 1])
+		);
 
-		console.log(isFirstElementAnInt)
-
-		if (!isFirstElementAnInt) {
-			return false
+		if (!isFirstElementInt) {
+			return false;
+		} else if (!isLastElementInt) {
+			return false;
 		}
 
-		return true
-	}
+		for (let i = 0; i < elements.length; i++) {
+			const hasDoubleOperator =
+				Number.isInteger(Number(elements[i])) === false &&
+				Number.isInteger(Number(elements[++i])) === false;
+
+			if (hasDoubleOperator) {
+				console.log("here I am");
+				return false;
+			}
+		}
+
+		return true;
+	};
 
 	// TODO: complete PEMDAS (will probably not include parenthesis or exponents)
 
 	const evaluateMultDiv = (elements) => {
-		let elementsString = elements.toString().replace(/,/gi, '');
+		let elementsString = elements.toString().replace(/,/gi, "");
 		let startPoint = 0;
 		let firstNum = 0;
+		let firstNumLength = 0;
 		let secondNum = 0;
 
-		console.log(parseInt(elementsString))
-	
 		for (let i = 0; i < elementsString.length; i++) {
-
 			firstNum = parseInt(elementsString);
-			
+			console.log(elementsString)
 		}
-	}
+	};
 
 	const evaluateElementsHandler = () => {
 		const elements = [...props.elements];
 
 		if (isValid(elements)) {
-			evaluateMultDiv(elements)
-			props.onEvaluateElements("")
+			evaluateMultDiv(elements);
+			props.onEvaluateElements("");
 		} else {
-			props.onEvaluateElements('error')
+			props.onEvaluateElements("error");
 		}
-	}
+	};
 
 	const clearElementsHandler = () => {
 		props.onEvaluateElements("0");
-	}
+	};
 
 	return (
 		<div>
 			<button onClick={evaluateElementsHandler}>=</button>
 			<button onClick={clearElementsHandler}>C</button>
 		</div>
-	)
-}
+	);
+};
 
 export default Calculate;

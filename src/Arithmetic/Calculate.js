@@ -20,34 +20,107 @@ const Calculate = (props) => {
 				Number.isInteger(Number(elements[++i])) === false;
 
 			if (hasDoubleOperator) {
-				console.log("here I am");
 				return false;
 			}
 		}
-
 		return true;
 	};
 
 	// TODO: complete PEMDAS (will probably not include parenthesis or exponents)
 
+	const getOperators = (elementsString) => {
+		let operatorsQueue = [];
+		for (let i=0; i<elementsString.length; i++) {
+			if (elementsString[i] === '+') {
+				operatorsQueue.push('+');
+			} else if (elementsString[i] === '-') {
+				operatorsQueue.push('-');
+			} else if (elementsString[i] === '*') {
+				operatorsQueue.push('*');
+			} else if (elementsString[i] === '/') {
+				operatorsQueue.push('/');
+			}
+		}
+		return operatorsQueue
+	}
+
+	const getNumOfOperators = (elements, elementsString) => {
+		let countDown = 0;
+		for (let i=0; i<elementsString.length; i++) {
+			let isInteger = Number.isInteger(Number(elements[i]));
+			if (isInteger !== true) {
+				countDown++;
+			}
+		}
+		return countDown;
+	}
+
+	const solve = (elements, operator) => {
+		let value = 0;
+		if (operator === '*') {
+			value = elements[0] * elements[1];
+		} else if (operator === '/') {
+			value = elements[0] / elements[1];
+		} else if (operator === '+') {
+			value = elements[0] + elements[1];
+		} else if (operator === '-') {
+			value = elements[0] - elements[1];
+		} 
+
+		elements.shift();
+		elements.shift();
+
+		elements = [value.toString(), ...elements];
+
+		return elements;
+	}
+
 	const evaluateMultDiv = (elements) => {
 		let elementsString = elements.toString().replace(/,/gi, "");
-		let startPoint = 0;
-		let firstNum = 0;
-		let firstNumLength = 0;
-		let secondNum = 0;
+		elements = elementsString.split(/[*:/]/).join(', ').split(/[+:-]/).join(', ').split(', ');
+		let newElements = [];
 
-		for (let i = 0; i < elementsString.length; i++) {
-			firstNum = parseInt(elementsString);
-			console.log(elementsString)
+		let operatorsQueue = getOperators(elementsString);
+
+		const countDown = getNumOfOperators(elements, elementsString)
+
+		for (let i=0; i<countDown; i++) {
+
+			let isMultiply = (operatorsQueue[i] === "*");
+			let isDivide = (operatorsQueue[i] === "/");
+
+			if (isMultiply) {
+	
+				elements = solve(elements, '*');
+				
+			} else if (isDivide) {
+				elements = solve(elements, '/');
+			}else {
+				let firstElementString = elements[0].toString();
+				for (let j=0; j < elements[0].length; j++) {
+					newElements.push(firstElementString[j])
+				}
+				elements.shift();
+
+				newElements.push(operatorsQueue[i])
+
+			}
+
 		}
+		const lastElement =  elements[elements.length - 1]
+		for (let j=0; j < lastElement.length; j++) {
+			newElements.push(lastElement[j])
+		}
+		
+		console.log(newElements)
 	};
 
 	const evaluateElementsHandler = () => {
-		const elements = [...props.elements];
+		let elements = [...props.elements];
 
 		if (isValid(elements)) {
-			evaluateMultDiv(elements);
+			elements = evaluateMultDiv(elements);
+			
 			props.onEvaluateElements("");
 		} else {
 			props.onEvaluateElements("error");

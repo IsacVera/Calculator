@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 
 const Display = (props) => {
 	return <p>{props.elements}</p>;

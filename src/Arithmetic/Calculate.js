@@ -1,70 +1,23 @@
 import React from "react";
 
+import {isValid, getOperators, getNumOfOperators} from './SearchForArithmetic.js';
+
 const Calculate = (props) => {
 
-	const isValid = (elements) => {
-		const isFirstElementInt = Number.isInteger(Number(elements[0]));
-		const isLastElementInt = Number.isInteger(
-			Number(elements[elements.length - 1])
-		);
-
-		if (!isFirstElementInt) {
-			return false;
-		} else if (!isLastElementInt) {
-			return false;
-		}
-
-		for (let i = 0; i < elements.length; i++) {
-			const hasDoubleOperator =
-				Number.isInteger(Number(elements[i])) === false &&
-				Number.isInteger(Number(elements[++i])) === false;
-
-			if (hasDoubleOperator) {
-				return false;
-			}
-		}
-		return true;
-	};
-
-	// TODO: complete PEMDAS (will probably not include parenthesis or exponents)
-
-	const getOperators = (elementsString) => {
-		let operatorsQueue = [];
-		for (let i=0; i<elementsString.length; i++) {
-			if (elementsString[i] === '+') {
-				operatorsQueue.push('+');
-			} else if (elementsString[i] === '-') {
-				operatorsQueue.push('-');
-			} else if (elementsString[i] === '*') {
-				operatorsQueue.push('*');
-			} else if (elementsString[i] === '/') {
-				operatorsQueue.push('/');
-			}
-		}
-		return operatorsQueue
-	}
-
-	const getNumOfOperators = (elements, elementsString) => {
-		let countDown = 0;
-		for (let i=0; i<elementsString.length; i++) {
-			let isInteger = Number.isInteger(Number(elements[i]));
-			if (isInteger !== true) {
-				countDown++;
-			}
-		}
-		return countDown;
-	}
+	// TODO: maybe complete () and ^
 
 	const solve = (elements, operator) => {
 		let value = 0;
+		const num1 = Number(elements[0]);
+		const num2 = Number(elements[1]);
 		if (operator === '*') {
-			value = elements[0] * elements[1];
+			value = num1 * num2;
 		} else if (operator === '/') {
-			value = elements[0] / elements[1];
+			value = num1 / num2;
 		} else if (operator === '+') {
-			value = elements[0] + elements[1];
+			value = num1 + num2;
 		} else if (operator === '-') {
-			value = elements[0] - elements[1];
+			value = num1 - num2;
 		} 
 
 		elements.shift();
@@ -75,53 +28,95 @@ const Calculate = (props) => {
 		return elements;
 	}
 
-	const evaluateMultDiv = (elements) => {
-		let elementsString = elements.toString().replace(/,/gi, "");
-		elements = elementsString.split(/[*:/]/).join(', ').split(/[+:-]/).join(', ').split(', ');
-		let newElements = [];
+	const breakDownElements = (elementObjects, operator1, operator2, countDown) => {
+		let elements = elementObjects[0];
+		let newElements = elementObjects[1];
+		const elementsString = elementObjects[2];
+		elementObjects.pop();
+		elementObjects.pop();
+		elementObjects.pop();
 
 		let operatorsQueue = getOperators(elementsString);
 
-		const countDown = getNumOfOperators(elements, elementsString)
-
 		for (let i=0; i<countDown; i++) {
+			let isOperator1 = (operatorsQueue[i] === operator1);
+			let isOperator2 = (operatorsQueue[i] === operator2);
 
-			let isMultiply = (operatorsQueue[i] === "*");
-			let isDivide = (operatorsQueue[i] === "/");
-
-			if (isMultiply) {
-	
-				elements = solve(elements, '*');
-				
-			} else if (isDivide) {
-				elements = solve(elements, '/');
+			if (isOperator1) {
+				elements = solve(elements, operator1);
+			} else if (isOperator2) {
+				elements = solve(elements, operator2);
 			}else {
 				let firstElementString = elements[0].toString();
+				elements.shift();
+
 				for (let j=0; j < elements[0].length; j++) {
 					newElements.push(firstElementString[j])
 				}
-				elements.shift();
-
-				newElements.push(operatorsQueue[i])
-
+				newElements.push(operatorsQueue[i]);
 			}
-
 		}
 		const lastElement =  elements[elements.length - 1]
 		for (let j=0; j < lastElement.length; j++) {
-			newElements.push(lastElement[j])
+			newElements.push(lastElement[j]);
 		}
-		
-		console.log(newElements)
+
+		return newElements;
+	}
+
+	const evaluateOperations = (elements, operators) => {
+		let elementsString = elements.toString().replace(/,/gi, "");
+		let combineElements = elementsString.split(/[*:/]/).join(', ').split(/[+:-]/).join(', ').split(', ');
+		let newElements = [];
+		let elementObjects = [];
+		let operator1, operator2 = '';
+
+		const countDown = getNumOfOperators(elementsString);
+
+		if (countDown === 0) {
+			const onlyElement =  combineElements[0]
+			for (let j=0; j < onlyElement.length; j++) {
+				newElements.push(onlyElement[j]);
+			}
+			return newElements;
+		}
+
+		if (operators === '*/') {
+			operator1 = '*';
+			operator2 = '/';
+		} else {
+			operator1 = '+';
+			operator2 = '-';
+		}
+
+		elementObjects.push(combineElements);
+		elementObjects.push(newElements);
+		elementObjects.push(elementsString);
+
+		newElements = breakDownElements(elementObjects, operator1, operator2, countDown);
+
+		return newElements;
+	}
+
+
+	const evaluateMultDiv = (elements) => {
+		elements = evaluateOperations(elements, '*/');
+		return elements;
 	};
+
+	const evaluateAddSub = (elements) => {
+		elements = evaluateOperations(elements, '+-');
+		return elements;
+	}
 
 	const evaluateElementsHandler = () => {
 		let elements = [...props.elements];
 
 		if (isValid(elements)) {
 			elements = evaluateMultDiv(elements);
+			elements = evaluateAddSub(elements);
 			
-			props.onEvaluateElements("");
+			props.onEvaluateElements(elements);
 		} else {
 			props.onEvaluateElements("error");
 		}

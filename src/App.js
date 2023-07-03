@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 
-import Display from "./Display/Display";
-import BasicArithmetic from "./Arithmetic/BasicArithmetic";
+import Display from "./Components/Display/Display";
+import BasicArithmetic from "./Components/Arithmetic/BasicArithmetic";
+
+import "./Components/Calculator.css";
 
 function App() {
 	const [savedElements, setSavedElements] = useState(["0"]);
@@ -26,12 +28,15 @@ function App() {
 
 	return (
 		<div className="App">
-			<Display elements={savedElements} />
-			<BasicArithmetic
-				onSavedElements={savedElementsHandler}
-				onEvaluateElements={evaluateElementsHandler}
-				elements={savedElements}
-			/>
+		    <div className="calculator">
+                <Display elements={savedElements} />
+			    <BasicArithmetic
+				    onSavedElements={savedElementsHandler}
+				    onEvaluateElements={evaluateElementsHandler}
+				    elements={savedElements}
+			    />
+
+            </div> 
 		</div>
 	);
 }

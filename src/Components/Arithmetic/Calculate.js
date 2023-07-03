@@ -47,14 +47,20 @@ const Calculate = (props) => {
 			} else if (isOperator2) {
 				elements = solve(elements, operator2);
 			}else {
-				let firstElementString = elements[0].toString();
+				let firstElementString = elements[0];
 				elements.shift();
 
-				for (let j=0; j < elements[0].length; j++) {
-					newElements.push(firstElementString[j])
-				}
-				newElements.push(operatorsQueue[i]);
-			}
+                try {
+
+				    for (let j=0; j < firstElementString.length; j++) {
+					    newElements.push(firstElementString[j])
+			        }
+                    newElements.push(operatorsQueue[i]);
+                    
+                } catch (e) {
+                    console.log(e)
+                }
+            }
 		}
 		const lastElement =  elements[elements.length - 1]
 		for (let j=0; j < lastElement.length; j++) {

@@ -3,26 +3,25 @@ import React, { useState } from "react";
 import Display from "./Components/Display/Display";
 import BasicArithmetic from "./Components/Arithmetic/BasicArithmetic";
 
-import "./Components/Calculator.css";
+import "./Components/Calculator.scss";
 
 function App() {
 	const [savedElements, setSavedElements] = useState(["0"]);
 
-
-	const savedElementsHandler = (newElement) => {
+	const savedElementsHandler = (newElement: string[]) => {
 		const isOnlyZero = (savedElements.length === 1 && savedElements[0] === "0");
 		const isErrorMessage = (savedElements[0] === 'e');
 
 		if (isOnlyZero || isErrorMessage) {
 			setSavedElements(newElement);
 		} else {
-			setSavedElements((prevElements) => {
+			setSavedElements((prevElements: any) => {
 				return [...prevElements, newElement];
 			});
 		}
 	};
 
-	const evaluateElementsHandler = (value) => {
+	const evaluateElementsHandler = (value: string[]) => {
 		setSavedElements(value);
 	};
 

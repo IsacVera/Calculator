@@ -1,12 +1,17 @@
 import React from "react";
 
-import {isValid, getOperators, getNumOfOperators} from './SearchForArithmetic.js';
+import {isValid, getOperators, getNumOfOperators, findInfinity} from './SearchForArithmetic';
 
-const Calculate = (props) => {
+interface CalculateProps {
+    onEvaluateElements: (value: string[]) => void;
+    ogElements: string[]
+}
 
+const Calculate = ({onEvaluateElements, ogElements}: CalculateProps) => {
+    
 	// TODO: maybe complete () and ^
 
-	const solve = (elements, operator) => {
+	const solve = (elements: string[], operator: string): string[] => {
 		let value = 0;
 		const num1 = Number(elements[0]);
 		const num2 = Number(elements[1]);
@@ -22,19 +27,16 @@ const Calculate = (props) => {
 
 		elements.shift();
 		elements.shift();
-
 		elements = [value.toString(), ...elements];
 
 		return elements;
 	}
 
-	const breakDownElements = (elementObjects, operator1, operator2, countDown) => {
+	const breakDownElements = 
+    (elementObjects: any, elementsString: string, operator1: string, operator2: string, countDown: number): string[] => {
 		let elements = elementObjects[0];
 		let newElements = elementObjects[1];
-		const elementsString = elementObjects[2];
-		elementObjects.pop();
-		elementObjects.pop();
-		elementObjects.pop();
+		elementObjects.pop(); elementObjects.pop();
 
 		let operatorsQueue = getOperators(elementsString);
 
@@ -47,34 +49,32 @@ const Calculate = (props) => {
 			} else if (isOperator2) {
 				elements = solve(elements, operator2);
 			}else {
+                const hasInfinity = findInfinity(elements);
+                if (hasInfinity === true) {
+                    return ['error'];
+                }
 				let firstElementString = elements[0];
 				elements.shift();
 
-                try {
-
-				    for (let j=0; j < firstElementString.length; j++) {
-					    newElements.push(firstElementString[j])
-			        }
-                    newElements.push(operatorsQueue[i]);
-                    
-                } catch (e) {
-                    console.log(e)
+                for (let j=0; j < firstElementString.length; j++) {
+                    newElements.push(firstElementString[j])
                 }
+                newElements.push(operatorsQueue[i]);
             }
 		}
-		const lastElement =  elements[elements.length - 1]
-		for (let j=0; j < lastElement.length; j++) {
-			newElements.push(lastElement[j]);
-		}
+        const lastElement =  elements[elements.length - 1]
+        for (let j=0; j < lastElement.length; j++) {
+            newElements.push(lastElement[j]);
+        }
 
 		return newElements;
 	}
 
-	const evaluateOperations = (elements, operators) => {
+	const evaluateOperations = (elements: string[], operators: string): string[] => {
 		let elementsString = elements.toString().replace(/,/gi, "");
 		let combineElements = elementsString.split(/[*:/]/).join(', ').split(/[+:-]/).join(', ').split(', ');
-		let newElements = [];
-		let elementObjects = [];
+		let newElements: string[] = [];
+		let elementArrays: string[][] = [];
 		let operator1, operator2 = '';
 
 		const countDown = getNumOfOperators(elementsString);
@@ -95,41 +95,40 @@ const Calculate = (props) => {
 			operator2 = '-';
 		}
 
-		elementObjects.push(combineElements);
-		elementObjects.push(newElements);
-		elementObjects.push(elementsString);
+		elementArrays.push(combineElements);
+		elementArrays.push(newElements);
 
-		newElements = breakDownElements(elementObjects, operator1, operator2, countDown);
+		newElements = breakDownElements(elementArrays, elementsString, operator1, operator2, countDown);
 
 		return newElements;
 	}
 
 
-	const evaluateMultDiv = (elements) => {
+	const evaluateMultDiv = (elements: string[]): string[] => {
 		elements = evaluateOperations(elements, '*/');
 		return elements;
 	};
 
-	const evaluateAddSub = (elements) => {
+	const evaluateAddSub = (elements: string[]): string[] => {
 		elements = evaluateOperations(elements, '+-');
 		return elements;
 	}
 
-	const evaluateElementsHandler = () => {
-		let elements = [...props.elements];
+	const evaluateElementsHandler = (): void => {
+		let elements = [...ogElements];
 
 		if (isValid(elements)) {
 			elements = evaluateMultDiv(elements);
 			elements = evaluateAddSub(elements);
 			
-			props.onEvaluateElements(elements);
+			onEvaluateElements(elements);
 		} else {
-			props.onEvaluateElements("error");
+			onEvaluateElements(["error"]);
 		}
 	};
 
-	const clearElementsHandler = () => {
-		props.onEvaluateElements("0");
+	const clearElementsHandler = (): void => {
+		onEvaluateElements(["0"]);
 	};
 
 	return (

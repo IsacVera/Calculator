@@ -3,19 +3,24 @@ import React from "react";
 // import ArithmeticButton from '../UI/ArithmeticButton'
 import Calculate from './Calculate'
 
-const BasicArithmetic = (props) => {
-	const elements = props.elements	
+interface BasicArithmeticProps {
+    onSavedElements(newElements: string[]): void;
+    onEvaluateElements: (value: string[]) => void;
+    elements: string[]; 
+}
 
-	const addElementHandler = (event) => {
-		props.onSavedElements(event.target.value);
+const BasicArithmetic = ({onSavedElements, onEvaluateElements, elements}: BasicArithmeticProps) => {
+
+	const addElementHandler = (event: any) => {
+		onSavedElements(event.target.value);
 	}
 
 	return (
 		<div>
 			<div>
 				<Calculate
-					onEvaluateElements={props.onEvaluateElements}
-					elements={elements}
+					onEvaluateElements={onEvaluateElements}
+					ogElements={elements}
 				/>
 			</div>
 

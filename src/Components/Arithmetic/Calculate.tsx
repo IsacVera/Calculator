@@ -1,6 +1,10 @@
 import React from "react";
 
+import './BasicArithmetic.scss'
+
 import {isValid, getOperators, getNumOfOperators, findInfinity} from './SearchForArithmetic';
+
+let penis = 'cock';
 
 interface CalculateProps {
     onEvaluateElements: (value: string[]) => void;
@@ -127,16 +131,7 @@ const Calculate = ({onEvaluateElements, ogElements}: CalculateProps) => {
 		}
 	};
 
-	const clearElementsHandler = (): void => {
-		onEvaluateElements(["0"]);
-	};
-
-	return (
-		<div>
-			<button onClick={evaluateElementsHandler}>=</button>
-			<button onClick={clearElementsHandler}>C</button>
-		</div>
-	);
+		return <button className='equal' onClick={evaluateElementsHandler}>=</button>;
 };
 
 export default Calculate;

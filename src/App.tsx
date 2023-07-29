@@ -16,13 +16,11 @@ function App() {
 	const [savedElements, setSavedElements] = useState(["0"]);
     
     const elementsHandler: ElementsHandlerType = {
-        savedHandler: (newElement: string[]) => {
+        savedHandler: (newElement: string[]): void => {
             const isOnlyZero = (savedElements.length === 1 && savedElements[0] === "0");
             const isErrorMessage = (savedElements[0] === 'e');
 
             setSavedElements((prevElements: any) => {
-                console.log(prevElements);
-                console.log(typeof(prevElements));
                 return [...prevElements, newElement]
             });
             if (isOnlyZero || isErrorMessage) {

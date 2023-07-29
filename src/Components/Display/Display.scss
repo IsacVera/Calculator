@@ -1,0 +1,24 @@
+$black: #282a2f;
+$border-grey: #474c4e;
+
+.input {
+    background: $black;
+    border: 1px solid $border-grey;
+    border-radius: 1px;
+    box-shadow: 0px 0px 4px ;
+    height: 60px;
+    width: 80%;
+    padding-right: 15px;
+    padding-top: 10px;
+    text-align: left;
+    margin: 0px 6px 0px 0px;
+    font-size: 2.5rem;
+    overflow-x: auto;
+    transition: all .2s ease-in-out;
+}
+
+.input:hover {
+  border: 1px solid #bbb;
+  -webkit-box-shadow: inset 0px 1px 4px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0px 1px 4px 0px rgba(0, 0, 0, 0.2);
+}
